@@ -3,7 +3,7 @@ nTiles = ctx.canvas.width / 20;
 
 function drawTile(obj, color) {
 	// ctx = built-in JS object, can draw to canvas
-	ctx.fillStyle = color
+	ctx.fillStyle = color;
 	ctx.fillRect(20 * obj.x, 20 * obj.y, 20, 20);
 }
 
@@ -19,7 +19,7 @@ snake = {
 			if (this.head != bodyPart
 					&& this.head.x == bodyPart.x
 					&& this.head.y == bodyPart.y)
-				return true
+				return true;
 		// Else check if head out of bounds
 		return this.head.x < 0 || this.head.x > nTiles - 1
 			|| this.head.y < 0 || this.head.y > nTiles - 1
@@ -78,15 +78,15 @@ let food = null;
 function playGame() {
 	// Clear game
 	ctx.clearRect(0, 0, 400, 400);
+	food = null;
+	document.getElementById('gameOverText').innerHTML = ''
+
+	// Construct new snake
 	snake.head = {
 		next: null,
 		x: Math.trunc(nTiles / 2),
 		y: Math.trunc(nTiles / 2),
 	};
-	food = null;
-	document.getElementById('gameOverText').innerHTML = ''
-
-	// Construct snake
 	for (let i = 0; i < 4; i++) snake.newHead();
 	snake.dir = Math.floor(Math.random() * 4)
 
@@ -134,6 +134,7 @@ function update(timestamp) {
 
 
 function gameOver() {
+	let length = 0;
 	for (let _ of snake)
 		++length;
 	document.getElementById('gameOverText').innerHTML = 'Length: ' + length
