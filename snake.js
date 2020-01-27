@@ -15,9 +15,11 @@ snake = {
 
 	isDead: function() {
 		// Check if head collides with another part
-		let bodyPart = this.head;
-		while (bodyPart = bodyPart.next)
-			if (this.head.x == bodyPart.x && this.head.y == bodyPart.y) return true
+		for (let bodyPart of snake)
+			if (this.head != bodyPart
+					&& this.head.x == bodyPart.x
+					&& this.head.y == bodyPart.y)
+				return true
 		// Else check if head out of bounds
 		return this.head.x < 0 || this.head.x > nTiles - 1
 			|| this.head.y < 0 || this.head.y > nTiles - 1
@@ -46,6 +48,26 @@ snake = {
 		while ((bodyPart = bodyPart.next).next.next);
 		drawTile(bodyPart.next, 'white')
 		bodyPart.next = null;
+	},
+
+	// Iterator: iterate through linked list
+	[Symbol.iterator]: function() {
+		let current = this.head;
+		return {
+			next: function() {
+				if (current) {
+					let val = current;
+					current = current.next;
+					return {
+						done: false,
+						value: val,
+					};
+				}
+				return {
+					done: true
+				};
+			},
+		}
 	},
 };
 
@@ -86,13 +108,11 @@ function update(timestamp) {
 			};
 
 			// Check if food spawned in snake
-			let bodyPart = snake.head;
-			while (bodyPart) {
+			for (let bodyPart of snake) {
 				if (food.x == bodyPart.x && food.y == bodyPart.y) {
 					food = null;
 					break;
 				}
-				bodyPart = bodyPart.next;
 			}
 
 			if (food) drawTile(food, 'red');
@@ -114,9 +134,7 @@ function update(timestamp) {
 
 
 function gameOver() {
-	let length = 1;
-	let bodyPart = snake.head;
-	while (bodyPart = bodyPart.next)
+	for (let _ of snake)
 		++length;
 	document.getElementById('gameOverText').innerHTML = 'Length: ' + length
 }
