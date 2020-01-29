@@ -1,31 +1,29 @@
 ctx = document.getElementById('canvas').getContext('2d');
 nTiles = ctx.canvas.width / 20;
 
-function drawTile(obj, color) {
-	// ctx = built-in JS object, can draw to canvas
+function drawTile({x, y}, color) {
 	ctx.fillStyle = color;
-	ctx.fillRect(20 * obj.x, 20 * obj.y, 20, 20);
+	ctx.fillRect(20 * x, 20 * y, 20, 20);
 }
 
-// Snake object links to linked list of part objects (x and y coords for body parts)
 snake = {
-	dir: 0, // 0 is right, 3 is down, moving ccw
-	newDir: 0, // prevents bug where snake turns in on itself in one turn
-	head: null,
+	dir: 0,     // 0 is right, 3 is down, moving ccw
+	newDir: 0,  // Prevents bug where snake turns in on itself in one turn
+	head: null, // Points to head of linked list
 
 	isDead: function() {
+		let {x, y} = this.head;
+
 		// Check if head collides with another part
 		for (let bodyPart of snake)
-			if (this.head != bodyPart
-					&& this.head.x == bodyPart.x
-					&& this.head.y == bodyPart.y)
+			if (this.head != bodyPart && x == bodyPart.x && y == bodyPart.y)
 				return true;
+
 		// Else check if head out of bounds
-		return this.head.x < 0 || this.head.x > nTiles - 1
-			|| this.head.y < 0 || this.head.y > nTiles - 1
+		return x < 0 || x > nTiles - 1 || y < 0 || y > nTiles - 1
 	},
 
-	newHead: function() {
+	newHead: function() { // Add new head to linked list and draw it
 		let dx = dy = 0;
 		switch (this.dir) {
 			case 0: dx =  1; break;
@@ -38,7 +36,6 @@ snake = {
 			x: this.head.x + dx,
 			y: this.head.y + dy,
 		}
-		// Draw new head
 		drawTile(this.head, 'black');
 	},
 
@@ -58,14 +55,9 @@ snake = {
 				if (current) {
 					let val = current;
 					current = current.next;
-					return {
-						done: false,
-						value: val,
-					};
+					return { done: false, value: val, };
 				}
-				return {
-					done: true
-				};
+				return { done: true, };
 			},
 		}
 	},
@@ -108,8 +100,8 @@ function update(timestamp) {
 			};
 
 			// Check if food spawned in snake
-			for (let bodyPart of snake) {
-				if (food.x == bodyPart.x && food.y == bodyPart.y) {
+			for (let {x, y} of snake) {
+				if (food.x == x && food.y == y) {
 					food = null;
 					break;
 				}
@@ -135,8 +127,7 @@ function update(timestamp) {
 
 function gameOver() {
 	let length = 0;
-	for (let _ of snake)
-		++length;
+	for (let _ of snake) ++length;
 	document.getElementById('gameOverText').innerHTML = 'Length: ' + length
 }
 
@@ -145,11 +136,7 @@ document.getElementById('playBtn').addEventListener('click', playGame)
 // Listen for left and right arrow keys
 document.addEventListener('keydown', event => {
 	switch (event.keyCode) {
-		case 37:
-			snake.newDir = (snake.dir + 1) % 4
-			break;
-		case 39:
-			snake.newDir = (snake.dir + 3) % 4
-			break;
+		case 37: snake.newDir = (snake.dir + 1) % 4; break;
+		case 39: snake.newDir = (snake.dir + 3) % 4; break;
 	}
 });
